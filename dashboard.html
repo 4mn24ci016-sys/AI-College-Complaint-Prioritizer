@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard | AI Prioritizer{% endblock %}
+{% block content %}
+<section class="dashboard-title">
+  <div>
+    <p class="eyebrow">ADMIN CONSOLE</p>
+    <h1>Complaint Priority Dashboard</h1>
+    <p class="lead">AI-ranked complaints appear first so administrators can act on urgent issues quickly.</p>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stat"><span>Total</span><strong>{{ stats.total }}</strong></div>
+  <div class="stat critical"><span>Critical</span><strong>{{ stats.critical }}</strong></div>
+  <div class="stat high"><span>High</span><strong>{{ stats.high }}</strong></div>
+  <div class="stat medium"><span>Medium</span><strong>{{ stats.medium }}</strong></div>
+  <div class="stat low"><span>Low</span><strong>{{ stats.low }}</strong></div>
+  <div class="stat"><span>Pending</span><strong>{{ stats.pending }}</strong></div>
+</section>
+
+<section class="table-wrap dashboard-table">
+<table>
+<tr>
+  <th>ID</th><th>Complaint</th><th>Student</th><th>Category</th>
+  <th>AI Priority</th><th>Reason</th><th>Status</th>
+</tr>
+{% for c in complaints %}
+<tr>
+  <td>#{{ c.id }}</td>
+  <td><strong>{{ c.title }}</strong><small>{{ c.description }}</small></td>
+  <td>{{ c.student_name }}<small>{{ c.student_email }}</small></td>
+  <td>{{ c.category }}</td>
+  <td>
+    <span class="priority {{ c.priority|lower }}">{{ c.priority }}</span>
+    <small>Score: {{ c.score }}/100</small>
+  </td>
+  <td class="reason">{{ c.reason }}</td>
+  <td>
+    <form action="{{ url_for('update_status', complaint_id=c.id) }}" method="post">
+      <select name="status" onchange="this.form.submit()">
+        {% for s in ['Pending','In Progress','Resolved','Rejected'] %}
+        <option {% if c.status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="7" class="empty">No complaints available.</td></tr>
+{% endfor %}
+</table>
+</section>
+{% endblock %}
